@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Australian Cities Weather</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #0a0a1a;
+            color: #f5f5f5;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        h1 {
+            text-align: center;
+            margin: 30px 0;
+            color: #64ffda;
+            font-size: 2.5rem;
+        }
+        
+        .weather-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 1400px;
+        }
+        
+        .weather-card {
+            background: linear-gradient(135deg, #112240, #1a365d);
+            border-radius: 15px;
+            padding: 20px;
+            width: 220px;
+            height: 380px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .weather-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .city-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #64ffda;
+        }
+        
+        .weather-icon {
+            width: 100px;
+            height: 100px;
+            margin: 15px 0;
+        }
+        
+        .temperature {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .weather-description {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .weather-details {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .detail {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+        
+        .detail-label {
+            color: #8892b0;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(17, 34, 64, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(100, 255, 218, 0.3);
+            border-radius: 50%;
+            border-top-color: #64ffda;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .weather-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .weather-card {
+                width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Australian Cities Weather</h1>
+    
+    <div class="weather-container" id="weatherContainer">
+        <!-- Weather cards will be inserted here dynamically -->
+    </div>
+
+    <script>
+        // Australian cities with their coordinates
+        const cities = [
+            { name: "Sydney", lat: -33.8688, lon: 151.2093 },
+            { name: "Melbourne", lat: -37.8136, lon: 144.9631 },
+            { name: "Brisbane", lat: -27.4698, lon: 153.0251 },
+            { name: "Adelaide", lat: -34.9285, lon: 138.6007 },
+            { name: "Canberra", lat: -35.2809, lon: 149.1300 },
+            { name: "Perth", lat: -31.9505, lon: 115.8605 },
+            { name: "Hobart", lat: -42.8821, lon: 147.3272 },
+            { name: "Darwin", lat: -12.4634, lon: 130.8456 },
+            { name: "Gold Coast", lat: -28.0167, lon: 153.4000 },
+            { name: "Newcastle", lat: -32.9283, lon: 151.7817 }
+            
+        ];
+        
+        // API key for OpenWeatherMap (replace with your own)
+        const apiKey = "YOUR_API_KEY";
+        
+        // Create weather cards for each city
+        function createWeatherCards() {
+            const container = document.getElementById('weatherContainer');
+            
+            cities.forEach(city => {
+                const card = document.createElement('div');
+                card.className = 'weather-card';
+                card.id = `card-${city.name.toLowerCase()}`;
+                
+                card.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                    </div>
+                    <h2 class="city-name">${city.name}</h2>
+                    <img class="weather-icon" src="" alt="Weather icon">
+                    <div class="temperature">--°C</div>
+                    <div class="weather-description">Loading...</div>
+                    <div class="weather-details">
+                        <div class="detail">
+                            <span class="detail-label">Humidity:</span>
+                            <span class="humidity">--%</span>
+                        </div>
+                        <div class="detail">
+                            <span class="detail-label">Wind:</span>
+                            <span class="wind">-- km/h</span>
+                        </div>
+                        <div class="detail">
+                            <span class="detail-label">Feels like:</span>
+                            <span class="feels-like">--°C</span>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+                
+                // Fetch weather data for this city
+                fetchWeatherData(city);
+            });
+        }
+        
+        // Fetch weather data from OpenWeatherMap API
+        async function fetchWeatherData(city) {
+            try {
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&units=metric&appid=${apiKey}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                updateWeatherCard(city.name, data);
+            } catch (error) {
+                console.error(`Error fetching weather for ${city.name}:`, error);
+                showError(city.name);
+            }
+        }
+        
+        // Update the weather card with fetched data
+        function updateWeatherCard(cityName, data) {
+            const cardId = `card-${cityName.toLowerCase()}`;
+            const card = document.getElementById(cardId);
+            
+            if (!card) return;
+            
+            // Remove loading spinner
+            const loading = card.querySelector('.loading');
+            if (loading) {
+                loading.remove();
+            }
+            
+            // Update weather information
+            const iconCode = data.weather[0].icon;
+            const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+            
+            card.querySelector('.weather-icon').src = iconUrl;
+            card.querySelector('.weather-icon').alt = data.weather[0].description;
+            card.querySelector('.temperature').textContent = `${Math.round(data.main.temp)}°C`;
+            card.querySelector('.weather-description').textContent = data.weather[0].description;
+            card.querySelector('.humidity').textContent = `${data.main.humidity}%`;
+            card.querySelector('.wind').textContent = `${Math.round(data.wind.speed * 3.6)} km/h`; // Convert m/s to km/h
+            card.querySelector('.feels-like').textContent = `${Math.round(data.main.feels_like)}°C`;
+        }
+        
+        // Show error in the card if fetching fails
+        function showError(cityName) {
+            const cardId = `card-${cityName.toLowerCase()}`;
+            const card = document.getElementById(cardId);
+            
+            if (!card) return;
+            
+            // Remove loading spinner
+            const loading = card.querySelector('.loading');
+            if (loading) {
+                loading.remove();
+            }
+            
+            card.querySelector('.weather-description').textContent = 'Failed to load data';
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            createWeatherCards();
+            
+            // Refresh data every 30 minutes
+            setInterval(() => {
+                cities.forEach(city => fetchWeatherData(city));
+            }, 30 * 60 * 1000);
+        });
+    </script>
+</body>
+</html>
+
