@@ -16,9 +16,47 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
+        /* Theme Variables */
+        :root {
+            --bg-primary: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            --bg-aurora-1: rgba(120, 119, 198, 0.3);
+            --bg-aurora-2: rgba(255, 119, 198, 0.2);
+            --bg-aurora-3: rgba(99, 255, 222, 0.15);
+            --text-primary: #f0f4f8;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --card-bg: #1a1c29;
+            --glass-bg: rgba(0, 0, 0, 0.25);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent: #64ffda;
+            --skeleton-base: rgba(255, 255, 255, 0.1);
+            --skeleton-shine: rgba(255, 255, 255, 0.2);
+            --title-gradient: linear-gradient(135deg, #00d9ff 0%, #64ffda 30%, #a8edea 60%, #fed6e3 100%);
+            --title-glow: drop-shadow(0 4px 20px rgba(100, 255, 218, 0.4));
+            --title-glow-strong: drop-shadow(0 4px 30px rgba(100, 255, 218, 0.7));
+        }
+
+        /* Light Theme - Warm Colors */
+        [data-theme="light"] {
+            --bg-primary: linear-gradient(135deg, #fef3e2 0%, #fce7d2 50%, #ffecd2 100%);
+            --bg-aurora-1: rgba(255, 183, 77, 0.2);
+            --bg-aurora-2: rgba(255, 138, 101, 0.15);
+            --bg-aurora-3: rgba(255, 213, 79, 0.1);
+            --text-primary: #5d4037;
+            --text-secondary: rgba(93, 64, 55, 0.7);
+            --card-bg: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.5);
+            --border-color: rgba(139, 90, 43, 0.15);
+            --accent: #e65100;
+            --skeleton-base: rgba(139, 90, 43, 0.08);
+            --skeleton-shine: rgba(139, 90, 43, 0.15);
+            --title-gradient: linear-gradient(135deg, #ff6f00 0%, #f4511e 40%, #e91e63 70%, #9c27b0 100%);
+            --title-glow: drop-shadow(0 4px 20px rgba(244, 81, 30, 0.4));
+            --title-glow-strong: drop-shadow(0 4px 30px rgba(233, 30, 99, 0.6));
+        }
+
         body {
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            color: #f0f4f8;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             padding: 30px 20px;
             min-height: 100vh;
             display: flex;
@@ -26,6 +64,7 @@
             align-items: center;
             position: relative;
             overflow-x: hidden;
+            transition: background 0.4s ease, color 0.3s ease;
         }
 
         /* Animated Aurora Background */
@@ -104,27 +143,28 @@
 
         h1 {
             text-align: center;
-            margin: 20px 0 50px;
+            margin: 20px 0 30px;
             font-size: 3rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #00d9ff 0%, #64ffda 30%, #a8edea 60%, #fed6e3 100%);
+            background: var(--title-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            filter: drop-shadow(0 4px 20px rgba(100, 255, 218, 0.4));
+            filter: var(--title-glow);
             letter-spacing: 1px;
             animation: titleGlow 3s ease-in-out infinite;
+            transition: background 0.4s ease, filter 0.4s ease;
         }
 
         @keyframes titleGlow {
 
             0%,
             100% {
-                filter: drop-shadow(0 4px 20px rgba(100, 255, 218, 0.4));
+                filter: var(--title-glow);
             }
 
             50% {
-                filter: drop-shadow(0 4px 30px rgba(100, 255, 218, 0.7));
+                filter: var(--title-glow-strong);
             }
         }
 
@@ -457,34 +497,239 @@
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
         }
 
+        /* Skeleton Loading */
         .loading {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 12, 41, 0.95);
+            background: var(--card-bg);
             backdrop-filter: blur(10px);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            padding: 24px 20px;
             z-index: 10;
             border-radius: 24px;
         }
 
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 3px solid rgba(100, 255, 218, 0.2);
+        .skeleton {
+            background: var(--skeleton-base);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                left: 100%;
+            }
+        }
+
+        .skeleton-city {
+            width: 100px;
+            height: 24px;
+            margin-bottom: 16px;
+        }
+
+        .skeleton-icon {
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
-            border-top-color: #64ffda;
-            animation: spin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+            margin: 12px 0;
+        }
+
+        .skeleton-temp {
+            width: 80px;
+            height: 40px;
+            margin: 8px 0;
+        }
+
+        .skeleton-desc {
+            width: 120px;
+            height: 16px;
+            margin-bottom: 20px;
+        }
+
+        .skeleton-details {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .skeleton-detail {
+            height: 70px;
+            border-radius: 14px;
+        }
+
+        /* Header Controls */
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .control-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: var(--accent);
+            color: #000;
+            transform: scale(1.1);
+            border-color: var(--accent);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .control-btn.refreshing {
+            animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
             to {
                 transform: rotate(360deg);
             }
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .last-updated {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            opacity: 0.8;
+        }
+
+        .last-updated::before {
+            content: '🕐';
+        }
+
+        /* Extra Data Row (UV + AQI) */
+        .extra-data {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .extra-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 8px 6px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(4px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .extra-value {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .extra-label {
+            font-size: 0.55rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* AQI Color Coding */
+        .aqi-good {
+            color: #4ade80;
+        }
+
+        .aqi-moderate {
+            color: #fbbf24;
+        }
+
+        .aqi-unhealthy {
+            color: #f97316;
+        }
+
+        .aqi-very-unhealthy {
+            color: #ef4444;
+        }
+
+        .aqi-hazardous {
+            color: #9333ea;
+        }
+
+        /* UV Color Coding */
+        .uv-low {
+            color: #4ade80;
+        }
+
+        .uv-moderate {
+            color: #fbbf24;
+        }
+
+        .uv-high {
+            color: #f97316;
+        }
+
+        .uv-very-high {
+            color: #ef4444;
+        }
+
+        .uv-extreme {
+            color: #d946ef;
         }
 
         @media (max-width: 768px) {
@@ -498,6 +743,10 @@
 
             .weather-card {
                 width: 300px;
+            }
+
+            .header-container {
+                flex-direction: column;
             }
         }
 
@@ -514,11 +763,23 @@
     <!-- Floating particles -->
     <div class="particles" id="particles"></div>
 
-    <h1>🌏 Australia Weather</h1>
+    <!-- Header with controls -->
+    <div class="header-container">
+        <h1>🌏 Australia Weather</h1>
+        <div class="header-controls">
+            <button class="control-btn" id="refreshBtn" title="Refresh Data">🔄</button>
+            <button class="control-btn" id="themeBtn" title="Toggle Theme">🌙</button>
+        </div>
+    </div>
 
     <div class="weather-container" id="weatherContainer">
         <!-- Weather cards will be inserted here dynamically -->
     </div>
+
+    <!-- Footer with last updated -->
+    <footer class="footer">
+        <div class="last-updated" id="lastUpdated">Loading...</div>
+    </footer>
 
     <script>
         // Create floating particles
@@ -565,13 +826,21 @@
                 // Add title attribute for accessibility
                 card.title = `Visit ${city.name} Official Website`;
 
-                // New cinematic structure
+                // Skeleton loading structure
                 card.innerHTML = `
                     <div class="card-bg"></div>
                     <div class="card-overlay"></div>
                     <div class="card-content">
                         <div class="loading">
-                            <div class="spinner"></div>
+                            <div class="skeleton skeleton-city"></div>
+                            <div class="skeleton skeleton-icon"></div>
+                            <div class="skeleton skeleton-temp"></div>
+                            <div class="skeleton skeleton-desc"></div>
+                            <div class="skeleton-details">
+                                <div class="skeleton skeleton-detail"></div>
+                                <div class="skeleton skeleton-detail"></div>
+                                <div class="skeleton skeleton-detail"></div>
+                            </div>
                         </div>
                         <h2 class="city-name">${city.name} <span style="font-size: 0.8rem; vertical-align: middle; opacity: 0.7;">↗</span></h2>
                         <div class="weather-icon">--</div>
@@ -592,6 +861,16 @@
                                 <span class="detail-icon">🌡️</span>
                                 <span class="detail-value feels-like">--°C</span>
                                 <span class="detail-label">Feels<br>Like</span>
+                            </div>
+                        </div>
+                        <div class="extra-data">
+                            <div class="extra-item">
+                                <span class="extra-value uv-value">--</span>
+                                <span class="extra-label">UV Index</span>
+                            </div>
+                            <div class="extra-item">
+                                <span class="extra-value aqi-value">--</span>
+                                <span class="extra-label">Air Quality</span>
                             </div>
                         </div>
                     </div>
@@ -660,8 +939,9 @@
         // Fetch weather data from Open-Meteo API (free, no API key required)
         async function fetchWeatherData(city) {
             try {
+                // Fetch weather + UV index in one call
                 const response = await fetch(
-                    `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=auto`
+                    `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,uv_index&timezone=auto`
                 );
 
                 if (!response.ok) {
@@ -669,7 +949,18 @@
                 }
 
                 const data = await response.json();
-                updateWeatherCard(city.name, data);
+
+                // Fetch Air Quality data (separate API)
+                const aqiResponse = await fetch(
+                    `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${city.lat}&longitude=${city.lon}&current=us_aqi`
+                );
+
+                let aqiData = null;
+                if (aqiResponse.ok) {
+                    aqiData = await aqiResponse.json();
+                }
+
+                updateWeatherCard(city.name, data, aqiData);
             } catch (error) {
                 console.error(`Error fetching weather for ${city.name}:`, error);
                 showError(city.name);
@@ -677,13 +968,13 @@
         }
 
         // Update the weather card with fetched data
-        function updateWeatherCard(cityName, data) {
+        function updateWeatherCard(cityName, data, aqiData) {
             const cardId = `card-${cityName.toLowerCase().replace(' ', '-')}`;
             const card = document.getElementById(cardId);
 
             if (!card) return;
 
-            // Remove loading spinner
+            // Remove loading skeleton
             const loading = card.querySelector('.loading');
             if (loading) {
                 loading.remove();
@@ -692,7 +983,7 @@
             // Parse Open-Meteo response format
             const current = data.current;
             const weatherCode = current.weather_code;
-            const weatherInfo = weatherCodeMap[weatherCode] || weatherCodeMap[0]; // Default to clear if unknown
+            const weatherInfo = weatherCodeMap[weatherCode] || weatherCodeMap[0];
 
             // 1. Set Background Image
             const cardBg = card.querySelector('.card-bg');
@@ -703,14 +994,57 @@
             // 2. Add weather category class for animations
             card.className = `weather-card weather-${weatherInfo.category}`;
 
-            // Update weather icon
+            // Update weather data
             card.querySelector('.weather-icon').textContent = weatherInfo.icon;
-
             card.querySelector('.temperature').textContent = `${Math.round(current.temperature_2m)}°C`;
             card.querySelector('.weather-description').textContent = weatherInfo.description;
             card.querySelector('.humidity').textContent = `${current.relative_humidity_2m}%`;
             card.querySelector('.wind').textContent = `${Math.round(current.wind_speed_10m)} km/h`;
             card.querySelector('.feels-like').textContent = `${Math.round(current.apparent_temperature)}°C`;
+
+            // Update UV Index with color coding
+            const uvValue = card.querySelector('.uv-value');
+            const uvIndex = current.uv_index !== undefined ? Math.round(current.uv_index * 10) / 10 : '--';
+            uvValue.textContent = uvIndex;
+            uvValue.className = 'extra-value uv-value ' + getUVClass(uvIndex);
+
+            // Update AQI with color coding
+            const aqiValue = card.querySelector('.aqi-value');
+            if (aqiData && aqiData.current && aqiData.current.us_aqi !== undefined) {
+                const aqi = aqiData.current.us_aqi;
+                aqiValue.textContent = getAQILabel(aqi);
+                aqiValue.className = 'extra-value aqi-value ' + getAQIClass(aqi);
+            } else {
+                aqiValue.textContent = 'N/A';
+            }
+        }
+
+        // Get UV index CSS class for color coding
+        function getUVClass(uv) {
+            if (uv === '--') return '';
+            if (uv < 3) return 'uv-low';
+            if (uv < 6) return 'uv-moderate';
+            if (uv < 8) return 'uv-high';
+            if (uv < 11) return 'uv-very-high';
+            return 'uv-extreme';
+        }
+
+        // Get AQI label from value
+        function getAQILabel(aqi) {
+            if (aqi <= 50) return 'Good';
+            if (aqi <= 100) return 'Moderate';
+            if (aqi <= 150) return 'Unhealthy';
+            if (aqi <= 200) return 'V.Unhealthy';
+            return 'Hazardous';
+        }
+
+        // Get AQI CSS class for color coding
+        function getAQIClass(aqi) {
+            if (aqi <= 50) return 'aqi-good';
+            if (aqi <= 100) return 'aqi-moderate';
+            if (aqi <= 150) return 'aqi-unhealthy';
+            if (aqi <= 200) return 'aqi-very-unhealthy';
+            return 'aqi-hazardous';
         }
 
         // Show error in the card if fetching fails
@@ -720,7 +1054,6 @@
 
             if (!card) return;
 
-            // Remove loading spinner
             const loading = card.querySelector('.loading');
             if (loading) {
                 loading.remove();
@@ -730,13 +1063,87 @@
             card.querySelector('.weather-description').textContent = 'Failed to load';
         }
 
+        // Update last updated timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-AU', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('lastUpdated').textContent = `Last updated: ${timeStr}`;
+        }
+
+        // Refresh all weather data
+        async function refreshAllData() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.classList.add('refreshing');
+
+            // Show loading state on all cards
+            document.querySelectorAll('.weather-card').forEach(card => {
+                const content = card.querySelector('.card-content');
+                if (content && !content.querySelector('.loading')) {
+                    const loadingDiv = document.createElement('div');
+                    loadingDiv.className = 'loading';
+                    loadingDiv.innerHTML = `
+                        <div class="skeleton skeleton-city"></div>
+                        <div class="skeleton skeleton-icon"></div>
+                        <div class="skeleton skeleton-temp"></div>
+                        <div class="skeleton skeleton-desc"></div>
+                    `;
+                    content.prepend(loadingDiv);
+                }
+            });
+
+            // Fetch all cities
+            await Promise.all(cities.map(city => fetchWeatherData(city)));
+
+            updateTimestamp();
+            refreshBtn.classList.remove('refreshing');
+        }
+
+        // Toggle theme
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeBtn = document.getElementById('themeBtn');
+            const currentTheme = html.getAttribute('data-theme');
+
+            if (currentTheme === 'light') {
+                html.removeAttribute('data-theme');
+                themeBtn.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                html.setAttribute('data-theme', 'light');
+                themeBtn.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Load saved theme
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeBtn = document.getElementById('themeBtn');
+
+            if (savedTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeBtn.textContent = '☀️';
+            }
+        }
+
         // Initialize the app
         document.addEventListener('DOMContentLoaded', () => {
+            loadSavedTheme();
             createWeatherCards();
+            updateTimestamp();
+
+            // Set up button event listeners
+            document.getElementById('refreshBtn').addEventListener('click', refreshAllData);
+            document.getElementById('themeBtn').addEventListener('click', toggleTheme);
 
             // Refresh data every 30 minutes
             setInterval(() => {
                 cities.forEach(city => fetchWeatherData(city));
+                updateTimestamp();
             }, 30 * 60 * 1000);
         });
     </script>
